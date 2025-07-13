@@ -27,7 +27,11 @@ jobs:
       - name: Generate output channels
         run: |
           cd firmware
-          java -cp ../java_tools/config_definition/build/libs/config_definition-all.jar com.rusefi.config.generated.OutputChannelConsumer
+          java -cp ../java_tools/config_definition/build/libs/config_definition-all.jar \
+          com.rusefi.output.OutputConfigurationConsumer \
+          config/boards/hellen/uaefi/generated_engine.txt \
+          live_data_generated/generated_engine \
+          config/boards/hellen/uaefi/generated_engine.java
           
       - name: Upload generated headers
         uses: actions/upload-artifact@v4
