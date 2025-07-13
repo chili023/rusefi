@@ -23,7 +23,7 @@ jobs:
       - name: Build code generators
         run: |
           cd java_tools
-          ./gradlew :config_definition:shadowJar
+          ./gradlew :config_definition:generate
 
       - name: Generate output headers
         run: |
