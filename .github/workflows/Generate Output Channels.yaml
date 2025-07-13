@@ -14,29 +14,22 @@ jobs:
         with:
           submodules: true
 
-      - name: Set up JDK
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'temurin'
-          java-version: '17'
-
-      - name: Build code generators
+      - name: Install dependencies
         run: |
-          cd java_tools
-          ./gradlew :config_definition:generate
+          sudo apt update
+          sudo apt install -y default-jre default-jdk
 
-      - name: Generate output channels
+      - name: Build Java generator
         run: |
           cd java_tools
           ./gradlew :config_definition:shadowJar
-          cd ..
+
+      - name: Run OutputChannelConsumer
+        run: |
           java -cp java_tools/config_definition/build/libs/config_definition-all.jar com.rusefi.output.OutputChannelConsumer
 
-
-
-
-      - name: Upload generated files
+      - name: Upload generated headers
         uses: actions/upload-artifact@v4
         with:
-          name: generated-headers
+          name: generated-output-channels
           path: firmware/live_data_generated/
