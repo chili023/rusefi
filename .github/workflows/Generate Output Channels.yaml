@@ -25,10 +25,14 @@ jobs:
           cd java_tools
           ./gradlew :config_definition:generate
 
-      - name: Generate output headers
+      - name: Generate output channels
         run: |
           cd java_tools
-          ./gradlew generate
+          ./gradlew :config_definition:shadowJar
+          cd ../firmware
+          java -cp ../java_tools/config_definition/build/libs/config_definition-all.jar com.rusefi.output.OutputChannelConsumer
+
+
 
       - name: Upload generated files
         uses: actions/upload-artifact@v4
