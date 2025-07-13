@@ -1,0 +1,32 @@
+name: Generate Output Channels
+
+on:
+  workflow_dispatch:
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Install dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y default-jre default-jdk
+
+      - name: Run code generators
+        run: |
+          cd java_tools
+          ./gradlew :config_definition:shadowJar
+          cd ../firmware
+          ./gen_generated_something.sh
+
+      - name: Upload generated files
+        uses: actions/upload-artifact@v4
+        with:
+          name: generated-headers
+          path: firmware/live_data_generated/
