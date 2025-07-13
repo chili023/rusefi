@@ -20,10 +20,10 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Run code generator
+      - name: Run config definition generator
         run: |
           cd java_tools
-          ./gradlew generateOutputChannels
+          ./gradlew :config_definition:generate
 
       - name: Upload generated files
         uses: actions/upload-artifact@v4
