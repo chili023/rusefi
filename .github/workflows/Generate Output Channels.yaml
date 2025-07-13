@@ -29,10 +29,9 @@ jobs:
       - name: Generate output channels
         run: |
           cd java_tools
-          ./gradlew :configuration_definition:shadowJar
+          ./gradlew :config_definition:shadowJar
           cd ../firmware
-          java -cp ../java_tools/configuration_definition/build/libs/config_definition-all.jar com.rusefi.output.OutputsSectionConsumer
-
+          java -cp ../java_tools/config_definition/build/libs/config_definition-all.jar com.rusefi.output.OutputsSectionConsumer
 
           
       - name: Upload generated headers
