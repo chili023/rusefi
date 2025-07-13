@@ -26,22 +26,22 @@ jobs:
           cd java_tools
           ./gradlew :config_definition:shadowJar
           
-      #- name: Generate output channels
-       # run: |
-        #  cd java_tools
-         # ./gradlew :config_definition:shadowJar
-          #cd ../firmware
-          #java -cp ../java_tools/config_definition/build/libs/config_definition-all.jar com.rusefi.output.OutputsSectionConsumer
-      - name: Generate output channels
+     
+
+      - name: Generate custom output headers
         run: |
-          ./java_tools/gradlew -p java_tools :config_definition:shadowJar
-          java -cp java_tools/configuration_definition/build/libs/config_definition-all.jar \
-          com.rusefi.output.GetOutputValueConsumer \
-          firmware/console/binary/output_channels.txt \
-          firmware/live_data_generated/output_channels_generated.h
+          cd java_tools
+          ./gradlew :config_definition:shadowJar
+          cd ../firmware
+          mkdir -p live_data_generated
+          java -cp ../java_tools/config_definition/build/libs/config_definition-all.jar \
+          com.rusefi.output.OutputConfigurationConsumer \
+          config/boards/hellen/uaefi/generated_engine.txt \
+          live_data_generated/generated_engine \
+          config/boards/hellen/uaefi/generated_engine.java
 
       - name: Upload generated headers
         uses: actions/upload-artifact@v4
         with:
-          name: generated-output-channels
+          name: generated-headers
           path: firmware/live_data_generated/
