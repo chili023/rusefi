@@ -1,0 +1,5 @@
+uint32_t engineHours;
+uint32_t pistonHours;
+uint32_t cylinderHours;
+uint32_t frontTireHours;
+uint32_t rearTireHours;
