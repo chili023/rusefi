@@ -1,7 +1,7 @@
 name: Build Engine Hours Firmware
 
 on:
-  push:
+ # push:
   workflow_dispatch:
 
 
