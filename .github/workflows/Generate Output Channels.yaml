@@ -28,7 +28,8 @@ jobs:
           
       - name: List JAR contents
         run: |
-          jar tf java_tools/configuration_definition/build/libs/config_definition-all.jar | grep rusefi | grep Output
+           jar tf java_tools/configuration_definition/build/libs/config_definition-all.jar | grep rusefi | grep Output
+
 
 
       - name: Generate output channels
