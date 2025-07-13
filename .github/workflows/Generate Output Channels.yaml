@@ -4,6 +4,8 @@ on:
   push:
   workflow_dispatch:
 
+  
+
 jobs:
   generate:
     runs-on: ubuntu-latest
@@ -23,6 +25,12 @@ jobs:
         run: |
           cd java_tools
           ./gradlew :config_definition:shadowJar
+          
+      - name: List classes in JAR
+        run: |
+          cd java_tools/config_definition/build/libs
+          jar tf config_definition-all.jar | grep Output || true
+
 
       - name: Generate output channels
         run: |
