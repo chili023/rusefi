@@ -29,8 +29,9 @@ jobs:
         run: |
           cd java_tools
           ./gradlew :config_definition:shadowJar
-          cd ../firmware
-          java -cp ../java_tools/config_definition/build/libs/config_definition-all.jar com.rusefi.output.OutputChannelConsumer
+          cd ..
+          java -cp java_tools/config_definition/build/libs/config_definition-all.jar com.rusefi.output.OutputChannelConsumer
+
 
 
 
