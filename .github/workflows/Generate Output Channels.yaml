@@ -36,11 +36,10 @@ jobs:
         run: |
           ./java_tools/gradlew -p java_tools :config_definition:shadowJar
           java -cp java_tools/configuration_definition/build/libs/config_definition-all.jar \
-          com.rusefi.output.OutputsSectionConsumer \
+          com.rusefi.output.GetOutputValueConsumer \
           firmware/console/binary/output_channels.txt \
           firmware/live_data_generated/output_channels_generated.h
 
-          
       - name: Upload generated headers
         uses: actions/upload-artifact@v4
         with:
