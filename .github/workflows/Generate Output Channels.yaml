@@ -26,6 +26,10 @@ jobs:
           cd java_tools
           ./gradlew :config_definition:shadowJar
           
+      - name: List classes in config_definition-all.jar
+        run: |
+          jar tf java_tools/config_definition/build/libs/config_definition-all.jar | grep rusefi | grep Consumer
+
      
 
       - name: Generate custom output headers
