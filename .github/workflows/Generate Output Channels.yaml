@@ -26,9 +26,10 @@ jobs:
           cd java_tools
           ./gradlew :config_definition:shadowJar
           
-      - name: Find all JAR files
+      - name: List JAR contents
         run: |
-          find . -name "*.jar" | grep config_definition || true
+          jar tf java_tools/configuration_definition/build/libs/config_definition-all.jar | grep rusefi | grep Output
+
 
       - name: Generate output channels
         run: |
