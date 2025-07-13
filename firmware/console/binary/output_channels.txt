@@ -48,6 +48,13 @@ bit sd_formating; SD: formating is in progress
 
 uint16_t RPMValue;@@GAUGE_NAME_RPM@@;"RPM",1, 0, 0, 8000, 0
 
+float engine_hours_front_tire "Engine hours front tire"
+float engine_hours_back_tire "Engine hours back tire"
+float engine_hours_cylinder "Engine hours cylinder"
+float engine_hours_piston "Engine hours piston"
+float engine_hours_engine "Engine hours engine"
+
+
 int16_t rpmAcceleration;dRPM;"RPM acceleration/Rate of Change/ROC",1, 0, 0, 5, 2
 
 	uint16_t autoscale speedToRpmRatio;@@GAUGE_NAME_GEAR_RATIO@@;"value",{1/@@PACK_MULT_PERCENT@@}, 0, 0, 0, 2
