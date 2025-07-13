@@ -20,6 +20,13 @@
  * You should have received a copy of the GNU General Public License along with this program.
  * If not, see <http://www.gnu.org/licenses/>.
  */
+static float frontTireHours = 0.0f;
+static float rearTireHours = 0.0f;
+static float cylinderHours = 0.0f;
+static float pistonHours = 0.0f;
+static float engineHours = 0.0f;
+
+static float secondsAccumulator = 0.0f;
 
 #include "pch.h"
 
@@ -191,6 +198,22 @@ static void doPeriodicSlowCallback() {
 #endif /* EFI_SHAFT_POSITION_INPUT */
 
 	engine->periodicSlowCallback();
+
+  //Engine Counter
+  if (getRpm() > 500) {  // Only count when engine is running
+    float delta = getTimeDeltaSeconds();  // time since last call
+    secondsAccumulator += delta;
+
+    if (secondsAccumulator >= 3600.0f) {
+        frontTireHours   += 1.0f;
+        rearTireHours    += 1.0f;
+        cylinderHours    += 1.0f;
+        pistonHours      += 1.0f;
+        engineHours      += 1.0f;
+
+        secondsAccumulator -= 3600.0f;
+    }
+}
 
 #if EFI_TCU
 	if (engineConfiguration->tcuEnabled && engineConfiguration->gearControllerMode != GearControllerMode::None) {
