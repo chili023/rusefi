@@ -1,0 +1,46 @@
+name: Build Engine Hours Firmware
+
+on:
+  push:
+  workflow_dispatch:
+
+
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Install dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y build-essential gcc-arm-none-eabi cmake ninja-build mtools python3-pip
+          python3 -m pip install pyserial
+
+      - name: Generate config
+        run: |
+          cd firmware
+          ./gen_config.sh
+
+      - name: Ensure signature output directory exists
+        run: |
+          mkdir -p firmware/tunerstudio/generated/signature_hellen
+
+      - name: Compile firmware (hellen/uaefi)
+        run: |
+          cd firmware
+          make -r SHORT_BOARD_NAME=hellen/uaefi BUILD_SIMULATOR=no -j$(nproc)
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine-hours-firmware
+          path: |
+            firmware/build/hellen/uaefi/*.bin
+            firmware/build/hellen/uaefi/*.elf
+            firmware/tunerstudio/generated/rusefi_hellen/uaefi.ini
