@@ -27,6 +27,7 @@ jobs:
 
       - name: Generate output headers
         run: |
+          cd java_tools
           ./gradlew generate
 
       - name: Upload generated files
