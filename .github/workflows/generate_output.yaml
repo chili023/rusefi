@@ -24,7 +24,8 @@ jobs:
           cd java_tools
           ./gradlew :config_definition:shadowJar
           cd ../firmware
-          ./gen_live_data.sh
+          ./generate_engine_output.sh
+
 
       - name: Upload generated files
         uses: actions/upload-artifact@v4
