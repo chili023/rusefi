@@ -16,8 +16,8 @@ name: Firmware at GHA
 #
 
 on:
-  push:
-  pull_request:
+  #push:
+  #pull_request:
   schedule:
     # this produces GitHub nightly releases https://github.com/rusefi/rusefi/releases
     # by the way GitHub actions use UTC https://www.utctime.net/ which matches GMT time
