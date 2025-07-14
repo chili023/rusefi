@@ -19,14 +19,15 @@ jobs:
           sudo apt update
           sudo apt install -y default-jdk mtools
 
+     
       - name: Build console_launcher.jar
         run: |
-          cd java_tools
           ./gradlew :java_console:shadowJar
 
       - name: Run generator
         run: |
           java -jar java_tools/java_console/build/libs/console_launcher.jar batch firmware/gen_config.sh
+          
 
       - name: Upload generated files
         uses: actions/upload-artifact@v4
