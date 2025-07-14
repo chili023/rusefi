@@ -1,39 +1,39 @@
-name: Generate output channels
+name: Generate Output Channels
 
 on:
   push:
-    branches: [ engine_hours ]  # <-- passe das ggf. an
+    branches:
+      - engine_hours  # <- change if your working branch has another name
   workflow_dispatch:
 
 jobs:
-  generate-output:
+  generate_outputs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout repo
         uses: actions/checkout@v3
 
-      - name: Set up Java 17
+      - name: Set up Java
         uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Make gradlew executable
-        run: chmod +x ./gradlew
-
-      - name: Build console_launcher
-        run: ./gradlew :java_console:shadowJar
-
-      - name: Run gen_config.sh to generate output headers
+      - name: Build config_definition shadowJar
         run: |
-          chmod +x firmware/gen_config.sh
-          firmware/gen_config.sh
+          cd java_tools
+          ./gradlew :config_definition:shadowJar
 
-      - name: Upload generated files for debug
+      - name: Generate output_channels_generated.h
+        run: |
+          java -cp java_tools/config_definition/build/libs/config_definition-all.jar \
+            com.rusefi.output.GetOutputValueConsumer \
+            firmware/console/output_channels.txt \
+            firmware/live_data_generated/output_channels_generated
+          
+      - name: Upload generated file
         uses: actions/upload-artifact@v4
         with:
-          name: generated-headers
-          path: |
-            firmware/live_data_generated/output_channels_generated.*
-            firmware/controllers/generated/output_channels.generated.*
+          name: output_channels_generated
+          path: firmware/live_data_generated/output_channels_generated.h
