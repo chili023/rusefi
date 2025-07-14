@@ -30,7 +30,7 @@ jobs:
 
       - name: Run generateHeaders
         run: |
-          cd java_tools
+          
           ./gradlew generateHeaders --stacktrace
 
       - name: Check output_channels_generated.h
