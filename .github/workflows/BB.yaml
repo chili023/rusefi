@@ -1,0 +1,36 @@
+name: Generate output_channels_generated.h
+
+on:
+  push:
+    branches: [ engine_hours ]
+  workflow_dispatch:  # Allows manual trigger
+
+jobs:
+  generate_headers:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Build config_definition-all.jar
+        working-directory: java_tools
+        run: ./gradlew :config_definition:shadowJar
+
+      - name: Run OutputsSectionConsumer
+        run: |
+          java -cp java_tools/config_definition/build/libs/config_definition-all.jar \
+            com.rusefi.output.OutputsSectionConsumer \
+            firmware/console/binary/output_channels.txt \
+            firmware/live_data_generated/output_channels_generated
+
+      - name: Check generated file
+        run: |
+          ls -l firmware/live_data_generated/output_channels_generated.h
+          grep engine_hours firmware/live_data_generated/output_channels_generated.h || echo "No engine_hours fields found"
