@@ -1,0 +1,38 @@
+name: Generate Output Channels
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Install Java + build tool
+        run: |
+          sudo apt update
+          sudo apt install -y default-jdk
+
+      - name: Build generator JAR
+        run: |
+          cd java_tools
+          ./gradlew :config_definition:shadowJar
+
+      - name: Run TsOutput generator
+        run: |
+          java -cp java_tools/config_definition/build/libs/config_definition-all.jar \
+          com.rusefi.output.TsOutput \
+          firmware/console/output_channels.txt \
+          firmware/live_data_generated/output_channels_generated
+
+      - name: Upload output
+        uses: actions/upload-artifact@v4
+        with:
+          name: output-headers
+          path: firmware/live_data_generated/
