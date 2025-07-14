@@ -1,38 +1,44 @@
-name: Generate rusEFI output files
+name: Generate rusEFI Output Channels
 
 on:
   push:
     branches:
-      - engine_hours  # adjust if needed
+      - engine_hours
+  workflow_dispatch:
 
 jobs:
   generate:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          submodules: true
 
-    - name: Set up JDK
-      uses: actions/setup-java@v3
-      with:
-        distribution: temurin
-        java-version: 17
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          distribution: temurin
+          java-version: 17
 
-    - name: Install required tools
-      run: sudo apt-get install -y mtools dosfstools
+      - name: Install filesystem tools
+        run: sudo apt-get update && sudo apt-get install -y mtools dosfstools
 
-    - name: Build config_definition shadowJar
-      run: |
-        cd java_tools
-        gradle :config_definition:shadowJar
+      - name: Build config_definition shadowJar
+        run: |
+          cd java_tools
+          gradle :config_definition:shadowJar
 
-    - name: Generate output channels
-      run: |
-        java -cp java_tools/config_definition/build/libs/config_definition-all.jar \
-          com.rusefi.output.TsOutput \
-          firmware/console/output_channels.txt \
-          firmware/live_data_generated/output_channels_generated
+      - name: Generate output_channels_generated.h
+        run: |
+          java -cp java_tools/config_definition/build/libs/config_definition-all.jar \
+            com.rusefi.output.TsOutput \
+            firmware/console/output_channels.txt \
+            firmware/live_data_generated/output_channels_generated
 
-    - name: Show diff
-      run: git diff -- firmware/live_data_generated/output_channels_generated.h
+      - name: Upload generated headers
+        uses: actions/upload-artifact@v4
+        with:
+          name: generated-headers
+          path: firmware/live_data_generated/output_channels_generated.h
