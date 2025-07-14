@@ -1,44 +1,26 @@
-name: Generate Output Channels
+name: List Gradle Tasks for config_definition
 
 on:
   push:
   workflow_dispatch:
 
 jobs:
-  generate:
+  list-tasks:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repo
+      - name: Checkout Repository
         uses: actions/checkout@v4
         with:
           submodules: true
 
-      - name: Install Java
-        run: sudo apt update && sudo apt install -y default-jdk
-      
-      - name: List all Gradle projects and tasks
-        run: |
-          cd java_tools
-          ./gradlew projects
-          ./gradlew tasks --all
-
-      - name: Build generator
-        run: |
-          cd java_tools
-          ./gradlew :java_console:shadowJar
-
-
-      - name: Run generator
-        run: |
-          java -cp java_tools/java_console/build/libs/java_console-all.jar \
-          com.rusefi.output.TsOutput \
-          firmware/console/output_channels.txt \
-          firmware/live_data_generated/output_channels_generated
-
-
-      - name: Upload output
-        uses: actions/upload-artifact@v4
+      - name: Set up JDK
+        uses: actions/setup-java@v3
         with:
-          name: output-headers
-          path: firmware/live_data_generated/
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: List config_definition Gradle Tasks
+        run: |
+          cd java_tools
+          ./gradlew :config_definition:tasks --all
