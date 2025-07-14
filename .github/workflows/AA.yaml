@@ -20,14 +20,16 @@ jobs:
       - name: Build generator
         run: |
           cd java_tools
-          ./gradlew :console_launcher:shadowJar
+          ./gradlew :java_console:shadowJar
+
 
       - name: Run generator
-        run: |
-          java -cp java_tools/console_launcher/build/libs/console_launcher-all.jar \
-          com.rusefi.output.TsOutput \
-          firmware/console/output_channels.txt \
-          firmware/live_data_generated/output_channels_generated
+      run: |
+        java -cp java_tools/java_console/build/libs/java_console-all.jar \
+        com.rusefi.output.TsOutput \
+        firmware/console/output_channels.txt \
+        firmware/live_data_generated/output_channels_generated
+
 
       - name: Upload output
         uses: actions/upload-artifact@v4
