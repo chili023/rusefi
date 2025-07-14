@@ -1,51 +1,40 @@
-name: Generate Output Channels
-
+name: Generate-Autogen-Files
 on:
   push:
+    branches: [ engine_hours ]
   workflow_dispatch:
-
-  
 
 jobs:
   generate:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
+      # Checkout the repository
+      - name: Check out code
+        uses: actions/checkout@v3
+
+      # Set up Java (use Java 17, which rusEFI uses for Gradle build)
+      - name: Set up Java
+        uses: actions/setup-java@v3
         with:
-          submodules: true
+          distribution: 'temurin'
+          java-version: '17'
 
-      - name: Install dependencies
+      # Build the ConfigDefinition tool (Gradle shadowJar)
+      - name: Build config_definition JAR
+        working-directory: java_tools
+        run: ./gradlew :config_definition:shadowJar
+
+      # Run the configuration generation script to regenerate headers and ini files
+      - name: Run config generation
+        working-directory: firmware
+        run: bash ./gen_config.sh
+
+      # (Optional) Verify if any files changed as a result of generation
+      - name: Check for changes
         run: |
-          sudo apt update
-          sudo apt install -y default-jdk
-
-      - name: Build code generator
-        run: |
-          cd java_tools
-          ./gradlew :config_definition:shadowJar
-          
-      - name: List classes in config_definition-all.jar
-        run: |
-          jar tf java_tools/config_definition/build/libs/config_definition-all.jar | grep rusefi | grep Consumer
-
-     
-
-      - name: Generate custom output headers
-        run: |
-          cd java_tools
-          ./gradlew :config_definition:shadowJar
-          cd ../firmware
-          mkdir -p live_data_generated
-          java -cp ../java_tools/config_definition/build/libs/config_definition-all.jar \
-          com.rusefi.output.OutputConfigurationConsumer \
-          config/boards/hellen/uaefi/generated_engine.txt \
-          live_data_generated/generated_engine \
-          config/boards/hellen/uaefi/generated_engine.java
-
-      - name: Upload generated headers
-        uses: actions/upload-artifact@v4
-        with:
-          name: generated-headers
-          path: firmware/live_data_generated/
+          if git status --porcelain | grep -q "firmware/"; then
+            echo "⚠️ Auto-generated files were updated.";
+            # Optionally, you could add steps here to commit or upload the changed files
+          else
+            echo "No changes in auto-generated files.";
+          fi
