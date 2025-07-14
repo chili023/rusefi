@@ -1,36 +1,39 @@
-name: Generate Output Channels
+name: Generate output channels
 
 on:
   push:
+    branches: [ engine_hours ]  # <-- passe das ggf. an
   workflow_dispatch:
 
 jobs:
-  generate:
+  generate-output:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v3
         with:
-          submodules: true
+          distribution: 'temurin'
+          java-version: '17'
 
-      - name: Install dependencies
+      - name: Make gradlew executable
+        run: chmod +x ./gradlew
+
+      - name: Build console_launcher
+        run: ./gradlew :java_console:shadowJar
+
+      - name: Run gen_config.sh to generate output headers
         run: |
-          sudo apt update
-          sudo apt install -y default-jdk mtools
+          chmod +x firmware/gen_config.sh
+          firmware/gen_config.sh
 
-     
-      - name: Build console_launcher.jar
-        run: |
-          ./gradlew :java_console:shadowJar
-
-      - name: Run generator
-        run: |
-          java -jar java_tools/java_console/build/libs/console_launcher.jar batch firmware/gen_config.sh
-          
-
-      - name: Upload generated files
+      - name: Upload generated files for debug
         uses: actions/upload-artifact@v4
         with:
-          name: generated-output-channels
-          path: firmware/live_data_generated/
+          name: generated-headers
+          path: |
+            firmware/live_data_generated/output_channels_generated.*
+            firmware/controllers/generated/output_channels.generated.*
