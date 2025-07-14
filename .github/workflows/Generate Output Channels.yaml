@@ -1,7 +1,7 @@
 name: Generate-Autogen-Files
 on:
-  push:
-    branches: [ engine_hours ]
+  #push:
+   # branches: [ engine_hours ]
   workflow_dispatch:
 
 jobs:
