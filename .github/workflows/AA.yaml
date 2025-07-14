@@ -24,11 +24,11 @@ jobs:
 
 
       - name: Run generator
-      run: |
-        java -cp java_tools/java_console/build/libs/java_console-all.jar \
-        com.rusefi.output.TsOutput \
-        firmware/console/output_channels.txt \
-        firmware/live_data_generated/output_channels_generated
+        run: |
+          java -cp java_tools/java_console/build/libs/java_console-all.jar \
+          com.rusefi.output.TsOutput \
+          firmware/console/output_channels.txt \
+          firmware/live_data_generated/output_channels_generated
 
 
       - name: Upload output
