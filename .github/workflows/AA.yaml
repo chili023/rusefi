@@ -1,8 +1,8 @@
 name: Generate firmware files for uaefi
 
 on:
-  push:
-    branches: [ engine_hours ]
+ # push:
+  #  branches: [ engine_hours ]
   workflow_dispatch:
 
 jobs:
