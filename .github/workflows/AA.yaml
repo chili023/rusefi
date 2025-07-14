@@ -1,18 +1,24 @@
-name: Generate Output Channels
+name: Firmware Build with Output Generation
 
 on:
   push:
     branches:
-      - engine_hours  # <- change if your working branch has another name
+      - engine_hours
   workflow_dispatch:
 
 jobs:
-  generate_outputs:
+  build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repo
+      - name: Checkout code
         uses: actions/checkout@v3
+
+      - name: Set up dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc-arm-none-eabi binutils-arm-none-eabi libnewlib-arm-none-eabi \
+            openjdk-17-jdk python3 python3-pip mtools dosfstools
 
       - name: Set up Java
         uses: actions/setup-java@v3
@@ -20,20 +26,13 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Build config_definition shadowJar
+      - name: Build firmware (includes output file generation)
         run: |
-          cd java_tools
-          ./gradlew :config_definition:shadowJar
+          export PATH=$PATH:/usr/lib/ccache
+          ./gradlew :firmware:build
 
-      - name: Generate output_channels_generated.h
-        run: |
-          java -cp java_tools/config_definition/build/libs/config_definition-all.jar \
-            com.rusefi.output.GetOutputValueConsumer \
-            firmware/console/output_channels.txt \
-            firmware/live_data_generated/output_channels_generated
-          
-      - name: Upload generated file
+      - name: Upload output_channels_generated.h
         uses: actions/upload-artifact@v4
         with:
-          name: output_channels_generated
+          name: output_headers
           path: firmware/live_data_generated/output_channels_generated.h
