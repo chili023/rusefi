@@ -1,36 +1,62 @@
-name: Generate output_channels_generated.h
+name: Validate Engine Hours Output Header
 
 on:
   push:
     branches: [ engine_hours ]
-  workflow_dispatch:  # Allows manual trigger
+  workflow_dispatch:
 
 jobs:
-  generate_headers:
+  validate-output-generation:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+    - name: Checkout your fork
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
 
-      - name: Set up Java
-        uses: actions/setup-java@v3
-        with:
-          distribution: temurin
-          java-version: 17
+    - name: Set up Java 17
+      uses: actions/setup-java@v3
+      with:
+        distribution: temurin
+        java-version: 17
 
-      - name: Build config_definition-all.jar
-        working-directory: java_tools
-        run: ./gradlew :config_definition:shadowJar
+    - name: Ensure gradle is available
+      run: sudo apt-get update && sudo apt-get install -y gradle
 
-      - name: Run OutputsSectionConsumer
-        run: |
-          java -cp java_tools/config_definition/build/libs/config_definition-all.jar \
-            com.rusefi.output.OutputsSectionConsumer \
-            firmware/console/binary/output_channels.txt \
-            firmware/live_data_generated/output_channels_generated
+    - name: Verify OutputsSectionConsumer.java exists
+      run: |
+        if ! test -f java_tools/configuration_definition/src/main/java/com/rusefi/output/OutputsSectionConsumer.java; then
+          echo "❌ OutputsSectionConsumer.java is missing!"
+          exit 1
+        fi
+        echo "✅ OutputsSectionConsumer.java is present."
 
-      - name: Check generated file
-        run: |
-          ls -l firmware/live_data_generated/output_channels_generated.h
-          grep engine_hours firmware/live_data_generated/output_channels_generated.h || echo "No engine_hours fields found"
+    - name: Build config_definition shadow JAR
+      run: |
+        cd java_tools
+        ./gradlew :config_definition:shadowJar
+
+    - name: Inspect JAR for OutputsSectionConsumer
+      run: |
+        jar tf java_tools/config_definition/build/libs/config_definition-all.jar | grep com/rusefi/output/OutputsSectionConsumer.class || {
+          echo "❌ OutputsSectionConsumer.class not found in JAR"
+          exit 1
+        }
+        echo "✅ OutputsSectionConsumer.class is in the JAR"
+
+    - name: Generate output headers
+      run: |
+        java -cp java_tools/config_definition/build/libs/config_definition-all.jar \
+          com.rusefi.output.OutputsSectionConsumer \
+          firmware/console/binary/output_channels.txt \
+          firmware/live_data_generated/output_channels_generated
+
+    - name: Verify generated header contains engine_hours
+      run: |
+        if grep -q "engine_hours_" firmware/live_data_generated/output_channels_generated.h; then
+          echo "✅ engine_hours fields generated"
+        else
+          echo "❌ engine_hours fields missing in output_channels_generated.h"
+          exit 1
+        fi
