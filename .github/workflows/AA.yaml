@@ -16,6 +16,12 @@ jobs:
 
       - name: Install Java
         run: sudo apt update && sudo apt install -y default-jdk
+      
+      - name: List all Gradle projects and tasks
+        run: |
+          cd java_tools
+          ./gradlew projects
+          ./gradlew tasks --all
 
       - name: Build generator
         run: |
