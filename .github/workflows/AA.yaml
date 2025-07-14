@@ -1,38 +1,38 @@
-name: Firmware Build with Output Generation
+name: Generate rusEFI output files
 
 on:
   push:
     branches:
-      - engine_hours
-  workflow_dispatch:
+      - engine_hours  # adjust if needed
 
 jobs:
-  build:
+  generate:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+    - name: Checkout code
+      uses: actions/checkout@v3
 
-      - name: Set up dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y gcc-arm-none-eabi binutils-arm-none-eabi libnewlib-arm-none-eabi \
-            openjdk-17-jdk python3 python3-pip mtools dosfstools
+    - name: Set up JDK
+      uses: actions/setup-java@v3
+      with:
+        distribution: temurin
+        java-version: 17
 
-      - name: Set up Java
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'temurin'
-          java-version: '17'
+    - name: Install required tools
+      run: sudo apt-get install -y mtools dosfstools
 
-      - name: Build firmware (includes output file generation)
-        run: |
-          export PATH=$PATH:/usr/lib/ccache
-          ./gradlew :firmware:build
+    - name: Build config_definition shadowJar
+      run: |
+        cd java_tools
+        gradle :config_definition:shadowJar
 
-      - name: Upload output_channels_generated.h
-        uses: actions/upload-artifact@v4
-        with:
-          name: output_headers
-          path: firmware/live_data_generated/output_channels_generated.h
+    - name: Generate output channels
+      run: |
+        java -cp java_tools/config_definition/build/libs/config_definition-all.jar \
+          com.rusefi.output.TsOutput \
+          firmware/console/output_channels.txt \
+          firmware/live_data_generated/output_channels_generated
+
+    - name: Show diff
+      run: git diff -- firmware/live_data_generated/output_channels_generated.h
