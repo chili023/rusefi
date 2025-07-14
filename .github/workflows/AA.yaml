@@ -14,19 +14,17 @@ jobs:
         with:
           submodules: true
 
-      - name: Install Java + build tool
-        run: |
-          sudo apt update
-          sudo apt install -y default-jdk
+      - name: Install Java
+        run: sudo apt update && sudo apt install -y default-jdk
 
-      - name: Build generator JAR
+      - name: Build generator
         run: |
           cd java_tools
-          ./gradlew :config_definition:shadowJar
+          ./gradlew :console_launcher:shadowJar
 
-      - name: Run TsOutput generator
+      - name: Run generator
         run: |
-          java -cp java_tools/config_definition/build/libs/config_definition-all.jar \
+          java -cp java_tools/console_launcher/build/libs/console_launcher-all.jar \
           com.rusefi.output.TsOutput \
           firmware/console/output_channels.txt \
           firmware/live_data_generated/output_channels_generated
