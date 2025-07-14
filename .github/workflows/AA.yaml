@@ -12,12 +12,12 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           submodules: true
 
       - name: Set up JDK 17
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 17
@@ -33,9 +33,10 @@ jobs:
       - name: Generate output_channels_generated.h
         run: |
           java -cp java_tools/config_definition/build/libs/config_definition-all.jar \
-            com.rusefi.output.TsOutput \
-            firmware/console/output_channels.txt \
-            firmware/live_data_generated/output_channels_generated
+          com.rusefi.output.TsOutput \
+          firmware/console/output_channels.txt \
+          firmware/live_data_generated/output_channels_generated.h
+         
 
       - name: Upload generated headers
         uses: actions/upload-artifact@v4
